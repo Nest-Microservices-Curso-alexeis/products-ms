@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Injectable, Logger, NotFoundException, OnModuleInit } from '@nestjs/common';
+import { HttpStatus, Injectable, Logger, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PrismaClient } from '@prisma/client';
 import { PaginationDto } from 'src/common';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class ProductsService extends PrismaClient implements OnModuleInit {
@@ -48,7 +49,11 @@ export class ProductsService extends PrismaClient implements OnModuleInit {
       }
     })
     if(!product) {
-      throw new NotFoundException(`El producto con el id #${id} no existe.`)
+      //throw new NotFoundException(`El producto con el id #${id} no existe.`)
+      throw new RpcException({
+        message:`El producto con el id #${id} no existe.`,
+        status: HttpStatus.BAD_REQUEST
+      })
     }
     return product
   }
